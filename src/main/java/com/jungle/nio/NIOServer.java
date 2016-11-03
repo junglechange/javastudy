@@ -26,13 +26,13 @@ public class NIOServer {
     }
 
     public void initServer(int port) throws Exception {
-        // »ñµÃÒ»¸öServerSocketÍ¨µÀ
+        // ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ServerSocketÍ¨ï¿½ï¿½
         ServerSocketChannel serverChannel = ServerSocketChannel.open();
-        // ÉèÖÃÍ¨µÀÎª·Ç×èÈû
+        // ï¿½ï¿½ï¿½ï¿½Í¨ï¿½ï¿½Îªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
         serverChannel.configureBlocking(false);
-        // ½«¸ÃÍ¨µÀ¶ÔÓ¦µÄServerSocket°ó¶¨µ½port¶Ë¿Ú
+        // ï¿½ï¿½ï¿½ï¿½Í¨ï¿½ï¿½ï¿½ï¿½Ó¦ï¿½ï¿½ServerSocketï¿½ó¶¨µï¿½portï¿½Ë¿ï¿½
         serverChannel.socket().bind(new InetSocketAddress(port));
-        // »ñµÃÒ»¸öÍ¨µÀ¹ÜÀíÆ÷
+        // ï¿½ï¿½ï¿½Ò»ï¿½ï¿½Í¨ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
         this.selector = Selector.open();
 
         serverChannel.register(selector, SelectionKey.OP_ACCEPT);
@@ -53,15 +53,15 @@ public class NIOServer {
                     channel.write(ByteBuffer.wrap(new String("hello sf").getBytes()));
                     channel.register(selector,SelectionKey.OP_READ);
                 } else if (key.isReadable()) {
-                    // ·þÎñÆ÷¿É¶ÁÈ¡ÏûÏ¢:µÃµ½ÊÂ¼þ·¢ÉúµÄSocketÍ¨µÀ
+                    // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½É¶ï¿½È¡ï¿½ï¿½Ï¢:ï¿½Ãµï¿½ï¿½Â¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½SocketÍ¨ï¿½ï¿½
                     SocketChannel channel = (SocketChannel) key.channel();
-                    // ´´½¨¶ÁÈ¡µÄ»º³åÇø
+                    // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È¡ï¿½Ä»ï¿½ï¿½ï¿½ï¿½ï¿½
                     ByteBuffer buffer = ByteBuffer.allocate(10);
                     channel.read(buffer);
                     byte[] data = buffer.array();
                     String msg = new String(data).trim();
-                    System.out.println("·þÎñ¶ËÊÕµ½ÐÅÏ¢£º"+msg);
-                    channel.write(ByteBuffer.wrap(new String("receive").getBytes()));// ½«ÏûÏ¢»ØËÍ¸ø¿Í»§¶Ë
+                    System.out.println("server-receive:"+msg);
+                    channel.write(ByteBuffer.wrap(new String("receive").getBytes()));// ï¿½ï¿½ï¿½ï¿½Ï¢ï¿½ï¿½ï¿½Í¸ï¿½Í»ï¿½ï¿½ï¿½
                 }
             }
         }
