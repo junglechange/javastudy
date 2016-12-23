@@ -1,6 +1,7 @@
 package com.jungle.jvm;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 public class VMError {
@@ -9,9 +10,10 @@ public class VMError {
 		//addObj();
 		try {
 			//stackOverflow();
-			multiThreadStackOverflow();
+			constantPoolOOM();
 		} catch (Throwable e) {
-			// TODO: handle exception			
+			// TODO: handle exception		
+			e.printStackTrace();
 			System.out.println(stackDepth);
 		}
 		
@@ -21,7 +23,7 @@ public class VMError {
 	 * VM args -Xms10m -Xmx10m -XX:+HeapDumpOnOutOfMemoryError
 	 */
 	public static void addObj() {
-		List<Object> objects = new ArrayList<>();
+		List<Object> objects = new ArrayList<Object>();
 		while (true) {
 			objects.add(new Object());
 		}
@@ -49,12 +51,26 @@ public class VMError {
 	 * VM args -Xss128k
 	 * 可能会死机
 	 */
-	public static void multiThreadStackOverflow() {
+	private static void multiThreadStackOverflow() {
 		while (true) {
 			new Thread(new T1()).start();
 			stackDepth++;
 		}
 		
+	}
+	
+	/**
+	 * -XX:PermSize=5M -XX:MaxPermSize=5M
+	 */
+	public static void constantPoolOOM(){
+		List<String> strings = new LinkedList<String>();
+		Integer i=0;
+		while(true){
+			String e=i.toString().intern();
+			//String te = e + "skjflsjdfioweuroiwjgjiofgjweiofjlskdjfoiwuroiwjeoifjiowejflkjoiewjfoiwe";
+			strings.add(e.intern());
+			i++;
+		}
 	}
 
 }
