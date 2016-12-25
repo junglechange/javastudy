@@ -6,10 +6,11 @@ import java.util.List;
 public class VMError {
 	public static int stackDepth=0;
 	public static void main(String[] args) {
+		System.out.println("hello");
 		//addObj();
 		try {
 			//stackOverflow();
-			multiThreadStackOverflow();
+			//multiThreadStackOverflow();
 		} catch (Throwable e) {
 			// TODO: handle exception			
 			System.out.println(stackDepth);
@@ -21,7 +22,7 @@ public class VMError {
 	 * VM args -Xms10m -Xmx10m -XX:+HeapDumpOnOutOfMemoryError
 	 */
 	public static void addObj() {
-		List<Object> objects = new ArrayList<>();
+		List<Object> objects = new ArrayList<Object>();
 		while (true) {
 			objects.add(new Object());
 		}
