@@ -31,7 +31,8 @@ public class VMError {
 	
 	/**
 	 * VM args -Xss128k
-	 * 增加局部变量会增加每个方法调用的栈帧的size，所以溢出的时候，调用栈的深度减少。
+	 * 增加局部变量会增加每个方法调用的栈帧的size,所以溢出的时候，调用栈的深度减少。
+	 * stack frame size can be calculated at compile time.
 	 * The stack frame, also known as activation record is the collection of all data on the stack associated with one subprogram call.
 	 * 
 	 */

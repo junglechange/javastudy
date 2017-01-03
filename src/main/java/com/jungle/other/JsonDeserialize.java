@@ -10,5 +10,7 @@ public class JsonDeserialize {
 		map1.put(1, "2");
 		map1.put("2", "3");
 		System.out.println(map1.get(new Integer(1)));
+		AccessRange accessRange = new AccEx();
+		accessRange.print();
 	}
 }
