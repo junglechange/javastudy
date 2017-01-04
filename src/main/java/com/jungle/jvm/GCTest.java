@@ -18,7 +18,12 @@ public class GCTest {
         byte[] b1 = new byte[2*bytes1MB];
         byte[] b2 = new byte[2*bytes1MB];
         byte[] b3 = new byte[2*bytes1MB];
+
         byte[] b4 = new byte[2*bytes1MB];
+
+        byte[] b5 = new byte[2*bytes1MB];
+        byte[] b6 = new byte[2*bytes1MB];
+        byte[] b7 = new byte[2*bytes1MB];
 
     }
 }
