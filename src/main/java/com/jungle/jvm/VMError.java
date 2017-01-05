@@ -7,6 +7,7 @@ import java.util.List;
 public class VMError {
 	public static int stackDepth=0;
 	public static void main(String[] args) {
+		System.out.println("hello");
 		//addObj();
 		try {
 			//stackOverflow();
@@ -79,7 +80,6 @@ public class VMError {
 
 	class T1 implements Runnable{
 
-		@Override
 		public void run() {
 			// TODO Auto-generated method stub
 			while (true) {
