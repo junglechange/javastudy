@@ -7,8 +7,8 @@ import java.util.concurrent.*;
 public class CompletionServiceTest {
 	
 	public static void main(String[] args){
-//		new CompletionServiceTest().test();
-        new CallableTest().run();
+		new CompletionServiceTest().test();
+        //new CallableTest().run();
 	}
 
     class CalcResult {
@@ -32,9 +32,10 @@ public class CompletionServiceTest {
 
         public CalcResult call() throws Exception {
             System.out.println(" Task " + taskName + " Started -----");
-            for(int i=0;i<input2 ;i++){
+            final int multiNum = 10000;
+            for(int i=0;i<input2*multiNum ;i++){
                 try {
-                    Thread.sleep(200);
+                    Thread.sleep(1);
                 } catch (InterruptedException e) {
                     System.out.println(" Task " + taskName + " Interrupted !! ");
                     e.printStackTrace();
@@ -48,7 +49,7 @@ public class CompletionServiceTest {
     }
 
     public void test(){
-        ExecutorService taskExecutor = Executors.newFixedThreadPool(3);
+        ExecutorService taskExecutor = Executors.newFixedThreadPool(10);
             CompletionService<CalcResult> taskCompletionService =
                new ExecutorCompletionService<CalcResult>(taskExecutor);
 
@@ -61,7 +62,7 @@ public class CompletionServiceTest {
                     ));
            System.out.println("Task " + String.valueOf(i) + "subitted");
         }
-        for(int tasksHandled=0;tasksHandled<1;tasksHandled++){
+        for(int tasksHandled=0;tasksHandled<submittedTasks;tasksHandled++){
             try {
                 System.out.println("trying to take from Completion service");
                 Future<CalcResult> result = taskCompletionService.take();
@@ -83,6 +84,7 @@ public class CompletionServiceTest {
                 System.out.println("Error get() threw exception");
             }
         }
+        taskExecutor.shutdown();
     }
 }
 
@@ -95,7 +97,7 @@ class CallableTest{
 			_inc = inc;
 		}
 
-        @Override
+        //@Override
 		public Integer call(){
             try{
                 Thread.sleep(5000);
