@@ -3,9 +3,7 @@ package com.jungle.concurrent;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.BlockingDeque;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -21,6 +19,7 @@ interface ThreadPool {
      */
     void summit(MyRunnable job);
     void shutdown();
+    void shutdown(boolean mode);
 }
 
 /**
@@ -39,6 +38,11 @@ class SimpleFixedThreadPool implements ThreadPool {
     private volatile boolean running = true;
     private volatile boolean shutdowning = false;
     private final Object shutdownLock = new Object();
+    private BlockingQueue<MyRunnable> blockingJobQ = new LinkedBlockingQueue<MyRunnable>();
+
+    public void shutdown(){
+
+    }
 
     public SimpleFixedThreadPool(int size){
         if(size>MAX_SIZE){
@@ -56,24 +60,58 @@ class SimpleFixedThreadPool implements ThreadPool {
 
     public void summit(MyRunnable job) {
         if (running){
-            synchronized (jobQ){
-                jobQ.add(job);
-                jobQ.notify();
+//            synchronized (jobQ){
+//                jobQ.add(job);
+//                jobQ.notify();
+//            }
+            try {
+                blockingJobQ.put(job);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
         }
     }
 
-    public void shutdown() {
+    public void shutdown(boolean isJobQ) {
         running=false;
-        synchronized (jobQ){
-            if (jobQ.isEmpty()){
+        if(isJobQ){
+            synchronized (jobQ){
+                if (jobQ.isEmpty()){
+                    for(Thread thread:threads){
+                        thread.interrupt();//maybe occur bug
+                        //System.out.println(thread.getState());
+                    }
+                }else {
+                    shutdowning = true;
+                }
+            }
+        }else{
+            if(blockingJobQ.isEmpty()){
                 for(Thread thread:threads){
                     thread.interrupt();//maybe occur bug
-                    //System.out.println(thread.getState());
                 }
             }else {
                 shutdowning = true;
             }
+        }
+
+
+    }
+
+
+    public MyRunnable takeJob() throws InterruptedException{
+        synchronized (jobQ){
+            if(jobQ.isEmpty()){
+                try {
+                    jobQ.wait();
+                } catch (InterruptedException e) {
+                    //e.printStackTrace();
+                    String tN = Thread.currentThread().getName();
+                    System.out.println(tN+" is interrupted");
+                    throw e;
+                }
+            }
+            return jobQ.remove(0);
         }
     }
 
@@ -82,27 +120,23 @@ class SimpleFixedThreadPool implements ThreadPool {
         public void run() {
             MyRunnable job = null;
             while (running){
-                synchronized (jobQ){
-                    if(jobQ.isEmpty()){
-                        try {
-                            jobQ.wait();
-                        } catch (InterruptedException e) {
-                            //e.printStackTrace();
-                            String tN = Thread.currentThread().getName();
-                            System.out.println(tN+" is interrupted");
-                            break;
-                        }
-                    }
-                    job = jobQ.remove(0);
+                try{
+                    job = blockingJobQ.take();
+                }catch (InterruptedException e){
+                    break;
                 }
                 job.run();
             }
             while (shutdowning){
-                synchronized (jobQ){
-                    if(jobQ.isEmpty()){
-                        break;
-                    }
-                    job = jobQ.remove(0);
+//                synchronized (jobQ){
+//                    if(jobQ.isEmpty()){
+//                        break;
+//                    }
+//                    job = jobQ.remove(0);
+//                }
+                job = blockingJobQ.poll();
+                if(job == null){
+                    break;
                 }
                 job.run();
             }
@@ -114,13 +148,15 @@ class SimpleFixedThreadPool implements ThreadPool {
 class MyJob implements MyRunnable{
     private static AtomicInteger idAtomic = new AtomicInteger(0);
     private int id = -1;
-    public MyJob(){
+    private int waitMs = 0;
+    public MyJob(int waitMs){
         id=idAtomic.addAndGet(1);
+        this.waitMs = waitMs;
     }
     public void run(){
         String tN = Thread.currentThread().getName();
         try {
-            Thread.currentThread().sleep(1000);
+            Thread.currentThread().sleep(waitMs);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -133,14 +169,15 @@ class MainClass {
         ThreadPool threadPool = new SimpleFixedThreadPool(3);
         final int jobNum = 40;
         for(int i=0;i<jobNum;i++){
-            MyJob job = new MyJob();
+            MyJob job = new MyJob(1000);
             threadPool.summit(job);
         }
+        threadPool.summit(new MyJob(200000));
 //        try {
 //            Thread.sleep(5000);//test interrupt wait thread
 //        } catch (InterruptedException e) {
 //            e.printStackTrace();
 //        }
-        threadPool.shutdown();
+        threadPool.shutdown(false);
     }
 }
