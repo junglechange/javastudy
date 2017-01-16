@@ -43,6 +43,19 @@ public class BlockingQueneTest {
 
         wThread.start();
         rThread.start();
+
+        new Thread().start();
+        try {
+            rThread.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+//        try {
+//            Thread.currentThread().join();
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+        System.out.println(Thread.currentThread().getName());
     }
 
     enum TestEnum {
