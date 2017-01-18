@@ -6,12 +6,15 @@ import java.util.List;
 
 public class VMError {
 	public static int stackDepth=0;
+	public static final int ONE_M = 1024*1024;
+	public static final byte[] BYTES = new byte[ONE_M*5];
+
 	public static void main(String[] args) {
 		System.out.println("hello");
 		//addObj();
 		try {
 			//stackOverflow();
-			constantPoolOOM();
+			//constantPoolOOM();
 		} catch (Throwable e) {
 			// TODO: handle exception		
 			e.printStackTrace();
@@ -62,7 +65,7 @@ public class VMError {
 	}
 	
 	/**
-	 * -XX:PermSize=5M -XX:MaxPermSize=5M
+	 * -XX:PermSize=5M -XX:MaxPermSize=5M -XX:+HeapDumpOnOutOfMemoryError
 	 */
 	public static void constantPoolOOM(){
 		List<String> strings = new LinkedList<String>();

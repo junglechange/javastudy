@@ -16,7 +16,8 @@ public class SocketServer {
             while (true){
                 Socket socket =serverSocket.accept();
                 InputStream inputStream = socket.getInputStream();
-                IReadScoket readScoket = new ReadInAnotherT(inputStream);
+//                IReadScoket readScoket = new ReadInAnotherT(inputStream);
+                IReadScoket readScoket = new ReadInOneT(inputStream);
                 readScoket.read();
             }
 //            Socket socket =serverSocket.accept();
